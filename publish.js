@@ -363,6 +363,10 @@ function buildSubNav(obj) {
 function buildSubNavMembers(list, type) {
     var html = '';
 
+    list = list.filter(item => {
+        return !item.mixed || item.hasApiDecorator;
+    });
+
     if (list.length) {
         html += '<div class="member-type">' + type + '</div>';
         html += '<ul class="inner">';
@@ -693,6 +697,25 @@ exports.publish = function(taffyData, opts, tutorials) {
             addSignatureTypes(doclet);
             addAttribs(doclet);
             doclet.kind = 'member';
+        }
+    });
+
+    let apiMethods = [];
+    data().each(function(doclet) {
+       //doclet.meta.filename === `uploadFiles.js`
+
+        for (const decorator of doclet.meta?.code?.node?.decorators ?? []) {
+            if (decorator.expression?.name === `api`) {
+                doclet.hasApiDecorator = true;
+                apiMethods.push(doclet.longname);
+            }
+        }
+    });
+
+    data().each(function(doclet) {
+        if (doclet.mixed) {
+            let intersection = apiMethods.filter(apiMethod => doclet.mixes.includes(apiMethod));
+            doclet.hasApiDecorator = intersection.length > 0;
         }
     });
 
