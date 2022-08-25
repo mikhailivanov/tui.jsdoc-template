@@ -45,8 +45,8 @@ function find(spec) {
 
 function tutoriallink(tutorial) {
     return helper.toTutorial(tutorial, null, {
-        tag: 'em', 
-        classname: 'disabled', 
+        tag: 'em',
+        classname: 'disabled',
         prefix: 'Tutorial: '
     });
 }
@@ -413,18 +413,24 @@ function buildMemberNav(items, itemHeading, itemsSeen, linktoFn) {
 }
 
 function makeItemHtmlInNav(item, linkHtml) {
-    return '<li>'
-        + linkHtml
-        + buildSubNav(item)
-        + '</li>';
+    return __makeItemHtmlInNav(item, linkHtml, '');
 }
 
 function makeCollapsibleItemHtmlInNav(item, linkHtml) {
+    return __makeItemHtmlInNav(item, linkHtml,
+        '<button type="button" class="hidden toggle-subnav btn btn-link">'
+        + '  <span class="glyphicon glyphicon-plus"></span>'
+        + '</button>');
+}
+
+function __makeItemHtmlInNav(item, linkHtml, collapsibleHtml) {
+    if (item.lwc) {
+        linkHtml = `<span class="icon green">LWC</span>&nbsp;` + linkHtml;
+    }
+
     return '<li>'
         + linkHtml
-        + '<button type="button" class="hidden toggle-subnav btn btn-link">'
-        + '  <span class="glyphicon glyphicon-plus"></span>'
-        + '</button>'
+        + collapsibleHtml
         + buildSubNav(item)
         + '</li>';
 }
