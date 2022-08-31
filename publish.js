@@ -383,7 +383,8 @@ function buildMemberNav(items, itemHeading, itemsSeen, linktoFn) {
     if (items.length) {
         var itemsNav = '';
         var className = itemHeading === tutorialsName ? 'lnb-examples hidden' : 'lnb-api hidden';
-        var makeHtml = env.conf.templates.useCollapsibles ? makeCollapsibleItemHtmlInNav : makeItemHtmlInNav;
+        var makeHtml = env.conf.templates.useCollapsibles
+            ? makeCollapsibleItemHtmlInNav : makeItemHtmlInNav;
 
         items.forEach(function (item) {
             var linkHtml;
@@ -463,39 +464,51 @@ function buildNav(members) {
     var seen = {};
     var seenTutorials = {};
 
-    nav += buildMemberNav(members.tutorials, tutorialsName, seenTutorials, linktoTutorial, true);
-    nav += buildMemberNav(members.modules, 'Modules', {}, linkto);
-    nav += buildMemberNav(members.externals, 'Externals', seen, linktoExternal);
-    nav += buildMemberNav(members.classes, 'Classes', seen, linkto);
-    nav += buildMemberNav(members.namespaces, 'Namespaces', seen, linkto);
-    nav += buildMemberNav(members.mixins, 'Mixins', seen, linkto);
-    nav += buildMemberNav(members.interfaces, 'Interfaces', seen, linkto);
+    for (const section of members.sections) {
+        nav += `<h2>${section || 'Main'}</h2>`;
 
-    if (members.globals.length) {
-        var globalNav = '';
-        var useGlobalTitleLink = true;
+        nav += buildMemberNav(members.tutorials.filter(item => item.section === section),
+            tutorialsName, seenTutorials, linktoTutorial, true);
+        nav += buildMemberNav(members.modules.filter(item => item.section === section),
+            'Modules', {}, linkto);
+        nav += buildMemberNav(members.externals.filter(item => item.section === section),
+            'Externals', seen, linktoExternal);
+        nav += buildMemberNav(members.classes.filter(item => item.section === section),
+            'Classes', seen, linkto);
+        nav += buildMemberNav(members.namespaces.filter(item => item.section === section),
+            'Namespaces', seen, linkto);
+        nav += buildMemberNav(members.mixins.filter(item => item.section === section),
+            'Mixins', seen, linkto);
+        nav += buildMemberNav(members.interfaces.filter(item => item.section === section),
+            'Interfaces', seen, linkto);
 
-        members.globals.forEach(function (g) {
-            if (!hasOwnProp.call(seen, g.longname)) {
-                // tuidoc
-                //  - Add global-typedef in hidden to search api.
-                //  - Default template did not add this.
-                if (g.kind === 'typedef') {
-                    globalNav += '<li class="hidden">' + linkto(g.longname, g.name) + '</li>';
-                } else {
-                    globalNav += '<li>' + linkto(g.longname, g.name) + '</li>';
-                    useGlobalTitleLink = false;
+        if (members.globals.filter(item => item.section === section).length) {
+            var globalNav = '';
+            var useGlobalTitleLink = true;
+
+            members.globals.filter(item => item.section === section).forEach(function (g) {
+                if (!hasOwnProp.call(seen, g.longname)) {
+                    // tuidoc
+                    //  - Add global-typedef in hidden to search api.
+                    //  - Default template did not add this.
+                    if (g.kind === 'typedef') {
+                        globalNav += '<li class="hidden">' + linkto(g.longname, g.name) + '</li>';
+                    } else {
+                        globalNav += '<li>' + linkto(g.longname, g.name) + '</li>';
+                        useGlobalTitleLink = false;
+                    }
                 }
+
+                seen[g.longname] = true;
+            });
+
+            if (useGlobalTitleLink) {
+                // turn the heading into a link so you can actually get to the global page
+                nav += '<div class="lnb-api hidden"><h3>' +
+                    linkto('global', 'Global') + '</h3></div>';
+            } else {
+                nav += '<div class="lnb-api hidden"><h3>Global</h3><ul>' + globalNav + '</ul></div>';
             }
-
-            seen[g.longname] = true;
-        });
-
-        if (useGlobalTitleLink) {
-            // turn the heading into a link so you can actually get to the global page
-            nav += '<div class="lnb-api hidden"><h3>' + linkto('global', 'Global') + '</h3></div>';
-        } else {
-            nav += '<div class="lnb-api hidden"><h3>Global</h3><ul>' + globalNav + '</ul></div>';
         }
     }
 
@@ -716,6 +729,7 @@ exports.publish = function (taffyData, opts, tutorials) {
     var members = helper.getMembers(data);
 
     members.tutorials = tutorials.children;
+    members.sections = Array.from(new Set(data().map(doclet => doclet.section)));
 
     // output pretty-printed source files by default
     var outputSourceFiles = conf.default && conf.default.outputSourceFiles !== false ? true :
