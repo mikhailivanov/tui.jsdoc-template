@@ -2,7 +2,7 @@ body {
     font-size: 12px;
     font-family: Helvetica Neue, Helvetica, Arial, Malgun gothic, '돋움', AppleSDGothicNeo;
 }
-ul, ol, li {list-style:none; padding-left:0; margin-left:0;}
+ul, ol, li {padding-left:0; margin-left:0;}
 
 /* Navigation - LNB */
 .lnb {
@@ -15,6 +15,7 @@ ul, ol, li {list-style:none; padding-left:0; margin-left:0;}
     background-color: #161b1d;
     padding: 0 20px;
 }
+.lnb li {list-style:none;}
 .lnb .logo {
     height: 13px;
     margin: 20px auto 0;
@@ -309,9 +310,6 @@ footer {
 .readme li p {
     padding: 10px 0;
     color: #333;
-}
-.readme p a {
-    color:#c7254e;
 }
 .readme h2 {
     padding-bottom: 3px;
