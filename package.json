@@ -22,7 +22,8 @@
     "tui"
   ],
   "dependencies": {
-    "cheerio": "^0.22.0"
+    "cheerio": "^0.22.0",
+    "taffydb": "^2.7.3"
   },
   "devDependencies": {
     "del": "^2.2.2",
