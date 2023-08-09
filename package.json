@@ -22,8 +22,8 @@
     "tui"
   ],
   "dependencies": {
-    "cheerio": "^0.22.0",
-    "taffydb": "2.6.2"
+    "@jsdoc/salty": "^0.2.5",
+    "cheerio": "^0.22.0"
   },
   "devDependencies": {
     "del": "^2.2.2",
